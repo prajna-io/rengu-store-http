@@ -60,6 +60,7 @@ class RenguStoreHttp(RenguStore):
     def __repr__(self):
         return f"RenguStoreHttp( {self.uri} )"
 
+
     def query(
         self,
         args: list[str],
@@ -73,4 +74,6 @@ class RenguStoreHttp(RenguStore):
         headers = {"Accept": "application/json", "Accept-Encoding": "gzip, deflate"}
         with requests.get(self.uri, {"q": args}, stream=True, headers=headers) as r:
             stream = ResponseStream(r.iter_content(ITER_SIZE))
+
+
             yield from (loads(j) for j in splitfile(stream, format="json"))
