@@ -7,13 +7,8 @@ PROJECT_ROOT = path.abspath(path.dirname(__file__))
 with open(path.join(PROJECT_ROOT, "README.md"), encoding="utf-8") as f:
     LONG_DESCRIPTION = f.read()
 
-requires_base = [
-    "rengu >= 6.0",
-    "requests",
-    "splitstream"
-]
-requires_extra = {
-}
+requires_base = ["rengu >= 6.0", "requests", "splitstream"]
+requires_extra = {}
 
 requires_extra["all"] = [m for v in requires_extra.values() for m in v]
 

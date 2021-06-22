@@ -60,6 +60,23 @@ class RenguStoreHttp(RenguStore):
     def __repr__(self):
         return f"RenguStoreHttp( {self.uri} )"
 
+    class ResultSet:
+        def __init__(self, uri, args):
+
+            self.args = args
+            self.uri = uri
+
+        def __iter__(self):
+            headers = {"Accept": "application/json", "Accept-Encoding": "gzip, deflate"}
+            r = requests.get(self.uri, {"q": self.args}, stream=True, headers=headers)
+            self.stream = splitfile(
+                ResponseStream(r.iter_content(ITER_SIZE)), format="json"
+            )
+
+            return self
+
+        def __next__(self):
+            return loads(next(self.stream))
 
     def query(
         self,
@@ -68,12 +85,10 @@ class RenguStoreHttp(RenguStore):
         count: int = -1,
         default_operator: str = "&",
         result: "RenguStoreHttp.ResultSet" = None,
-        with_data: bool = True
+        with_data: bool = True,
     ):
 
         headers = {"Accept": "application/json", "Accept-Encoding": "gzip, deflate"}
         with requests.get(self.uri, {"q": args}, stream=True, headers=headers) as r:
             stream = ResponseStream(r.iter_content(ITER_SIZE))
-
-
             yield from (loads(j) for j in splitfile(stream, format="json"))
