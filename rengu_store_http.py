@@ -2,6 +2,7 @@
 from io import BytesIO, SEEK_SET, SEEK_END
 from urllib.parse import urlencode
 from json import loads
+from uuid import UUID
 
 import requests
 from splitstream import splitfile
@@ -57,12 +58,15 @@ class RenguStoreHttp(RenguStore):
         self.uri = name
         self.extra = extra
 
+        self.cache = {}
+
     def __repr__(self):
         return f"RenguStoreHttp( {self.uri} )"
 
     class ResultSet:
-        def __init__(self, uri, args):
+        def __init__(self, parent, uri, args):
 
+            self.parent = parent
             self.args = args
             self.uri = uri
 
@@ -76,7 +80,13 @@ class RenguStoreHttp(RenguStore):
             return self
 
         def __next__(self):
-            return loads(next(self.stream))
+            x = loads(next(self.stream))
+            id = UUID(x.get("ID"))
+            self.parent.cache[id] = x
+            return id
+
+    def get(self, id: UUID) -> dict:
+        return self.cache.get(id)
 
     def query(
         self,
@@ -88,7 +98,9 @@ class RenguStoreHttp(RenguStore):
         with_data: bool = True,
     ):
 
-        headers = {"Accept": "application/json", "Accept-Encoding": "gzip, deflate"}
-        with requests.get(self.uri, {"q": args}, stream=True, headers=headers) as r:
-            stream = ResponseStream(r.iter_content(ITER_SIZE))
-            yield from (loads(j) for j in splitfile(stream, format="json"))
+        # headers = {"Accept": "application/json", "Accept-Encoding": "gzip, deflate"}
+        # with requests.get(self.uri, {"q": args}, stream=True, headers=headers) as r:
+        #    stream = ResponseStream(r.iter_content(ITER_SIZE))
+        #    yield from (loads(j) for j in splitfile(stream, format="json"))
+
+        return self.ResultSet(self, self.uri, args)
