@@ -81,12 +81,12 @@ class RenguStoreHttp(RenguStore):
 
         def __next__(self):
             x = loads(next(self.stream))
-            id = UUID(x.get("ID"))
-            self.parent.cache[id] = x
-            return id
+            ID = UUID(x.get("ID"))
+            self.parent.cache[ID] = x
+            return ID
 
-    def get(self, id: UUID) -> dict:
-        return self.cache.get(id)
+    def get(self, ID: UUID) -> dict:
+        return self.cache.get(ID)
 
     def query(
         self,
