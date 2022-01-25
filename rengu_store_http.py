@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from io import BytesIO, SEEK_SET, SEEK_END
 from urllib.parse import urlencode
-from json import loads
+from json import loads, dumps
 from uuid import UUID
 
 import requests
@@ -85,6 +85,10 @@ class RenguStoreHttp(RenguStore):
             self.parent.cache[ID] = x
             return ID
 
+        def __repr__(self):
+
+            return dumps(self.args)
+
     def get(self, ID: UUID) -> dict:
         return self.cache.get(ID)
 
@@ -104,3 +108,13 @@ class RenguStoreHttp(RenguStore):
         #    yield from (loads(j) for j in splitfile(stream, format="json"))
 
         return self.ResultSet(self, self.uri, args)
+
+    def save(self, obj):
+        headers = {"Accept": "application/json", "Accept-Encoding": "gzip, deflate"}
+        r = requests.post(self.uri, json=obj, headers=headers)
+        return r.json().get("ID")
+
+    def delete_not_implemented(self, ID):
+        headers = {"Accept": "application/json", "Accept-Encoding": "gzip, deflate"}
+        r = requests.delete(self.uri + f"/{ID}", headers=headers)
+        return r.ok
