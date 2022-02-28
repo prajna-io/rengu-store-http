@@ -70,13 +70,13 @@ class RenguStoreHttp(RenguStore):
             self.args = args
             self.uri = uri
 
-        def __iter__(self):
             headers = {"Accept": "application/json", "Accept-Encoding": "gzip, deflate"}
             r = requests.get(self.uri, {"q": self.args}, stream=True, headers=headers)
             self.stream = splitfile(
                 ResponseStream(r.iter_content(ITER_SIZE)), format="json"
             )
 
+        def __iter__(self):
             return self
 
         def __next__(self):
@@ -117,7 +117,7 @@ class RenguStoreHttp(RenguStore):
         r = requests.post(self.uri, json=obj, headers=headers)
         return r.json().get("ID")
 
-    def delete_not_implemented(self, ID):
+    def delete(self, ID):
         headers = {"Accept": "application/json", "Accept-Encoding": "gzip, deflate"}
         r = requests.delete(self.uri + f"/{ID}", headers=headers)
         return r.ok
