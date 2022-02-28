@@ -89,6 +89,9 @@ class RenguStoreHttp(RenguStore):
 
             return dumps(self.args)
 
+    def __len__(self):
+        return 100000
+
     def get(self, ID: UUID) -> dict:
         return self.cache.get(ID)
 
