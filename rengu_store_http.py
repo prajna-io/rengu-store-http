@@ -92,7 +92,7 @@ class RenguStoreHttp(RenguStore):
     def __len__(self):
         headers = {"Accept": "application/json", "Accept-Encoding": "gzip, deflate"}
         r = requests.get(self.uri + f"/?cmd=info", headers=headers)
-        return r.json().get("Base.Count")
+        return r.json().get("Count")
 
     def get(self, ID: UUID) -> dict:
         return self.cache.get(ID)
