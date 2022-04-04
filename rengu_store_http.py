@@ -1,18 +1,15 @@
-# -*- coding: utf-8 -*-
-from io import BytesIO, SEEK_SET, SEEK_END
-from urllib.parse import urlencode
-from json import loads, dumps
+from io import SEEK_END, SEEK_SET, BytesIO
+from json import dumps, loads
 from uuid import UUID
 
 import requests
-from splitstream import splitfile
-
 from rengu.store import RenguStore
+from splitstream import splitfile
 
 ITER_SIZE = 65536
 
 # From https://gist.github.com/obskyr/b9d4b4223e7eaf4eedcd9defabb34f13
-class ResponseStream(object):
+class ResponseStream:
     def __init__(self, request_iterator):
         self._bytes = BytesIO()
         self._iterator = request_iterator
